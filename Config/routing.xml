@@ -8,7 +8,7 @@
         <default key="_controller">RewriteUrl\Controller\Admin\ModuleConfigController::viewConfigAction</default>
     </route>
     <route id="rewrite.url.config.get.rules" path="/admin/module/RewriteUrl/get-rules">
-        <default key="_controller">RewriteUrl\Controller\Admin\ModuleConfigController::getRules</default>
+        <default key="_controller">RewriteUrl\Controller\Admin\ModuleConfigController::getDatatableRules</default>
     </route>
     <route id="rewrite.url.config.set-rewriting_enable" path="/admin/module/RewriteUrl/config/setRewritingEnable">
         <default key="_controller">RewriteUrl\Controller\Admin\ModuleConfigController::setRewritingEnableAction</default>

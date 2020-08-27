@@ -32,7 +32,7 @@ class ModuleConfigController extends BaseAdminController
         );
     }
 
-    public function getRules()
+    public function getDatatableRules()
     {
         $request = $this->getRequest();
 
@@ -49,22 +49,23 @@ class ModuleConfigController extends BaseAdminController
 
         $recordsFiltered = $search->count();
 
-        $search->clearOrderByColumns();
-        switch ($request->get('order')[0]['column']) {
+        $orderColumn = $request->get('order')[0]['column'];
+        $orderDirection = $request->get('order')[0]['dir'];
+        switch ($orderColumn) {
             case '0':
-                $search->orderByRuleType($request->get('order')[0]['dir']);
+                $search->orderByRuleType($orderDirection);
                 break;
             case '1':
-                $search->orderByValue($request->get('order')[0]['dir']);
+                $search->orderByValue($orderDirection);
                 break;
             case '2':
-                $search->orderByOnly404($request->get('order')[0]['dir']);
+                $search->orderByOnly404($orderDirection);
                 break;
             case '3':
-                $search->orderByRedirectUrl($request->get('order')[0]['dir']);
+                $search->orderByRedirectUrl($orderDirection);
                 break;
             case '4':
-                $search->orderByPosition($request->get('order')[0]['dir']);
+                $search->orderByPosition($orderDirection);
                 break;
             default:
                 $search->orderByPosition();
@@ -149,7 +150,6 @@ class ModuleConfigController extends BaseAdminController
         return $this->jsonResponse(json_encode(["state" => "Success"]), 200);
     }
 
-
     public function updateRuleAction()
     {
         try {
@@ -193,7 +193,6 @@ class ModuleConfigController extends BaseAdminController
         return $this->jsonResponse(json_encode(["state" => "Success"]), 200);
     }
 
-
     public function moveRulePositionAction()
     {
         try {
@@ -225,8 +224,6 @@ class ModuleConfigController extends BaseAdminController
         return $this->jsonResponse(json_encode(["state" => "Success"]), 200);
     }
 
-
-
     protected function fillRuleObjectFields(RewriteurlRule $rule, $request)
     {
         $ruleType = $request->get("ruleType", null);
@@ -252,8 +249,6 @@ class ModuleConfigController extends BaseAdminController
             }
         }
 
-
-
         $rule->setRuleType($ruleType);
         $rule->setValue($regexValue);
         $rule->setOnly404($request->get("only404", 1));
@@ -261,7 +256,6 @@ class ModuleConfigController extends BaseAdminController
         if (empty($rule->getPosition())) {
             $rule->setPosition($rule->getNextPosition());
         }
-
 
         $rule->deleteAllRelatedParam();
 

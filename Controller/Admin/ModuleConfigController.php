@@ -2,11 +2,13 @@
 
 namespace RewriteUrl\Controller\Admin;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use RewriteUrl\Model\RewriteurlRule;
 use RewriteUrl\Model\RewriteurlRuleParam;
 use RewriteUrl\Model\RewriteurlRuleQuery;
 use RewriteUrl\RewriteUrl;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
@@ -28,6 +30,92 @@ class ModuleConfigController extends BaseAdminController
                 "isRewritingEnabled" => $isRewritingEnabled
             ]
         );
+    }
+
+    public function getRules()
+    {
+        $request = $this->getRequest();
+
+        $requestSearchValue = $request->get('search') ? '%' . $request->get('search')['value'] . '%' : "";
+        $recordsTotal = RewriteurlRuleQuery::create()->count();
+        $search = RewriteurlRuleQuery::create();
+        if ("" !== $requestSearchValue) {
+            $search
+                ->filterByValue($requestSearchValue, Criteria::LIKE)
+                ->_or()
+                ->filterByRedirectUrl($requestSearchValue)
+            ;
+        }
+
+        $recordsFiltered = $search->count();
+
+        $search->clearOrderByColumns();
+        switch ($request->get('order')[0]['column']) {
+            case '0':
+                $search->orderByRuleType($request->get('order')[0]['dir']);
+                break;
+            case '1':
+                $search->orderByValue($request->get('order')[0]['dir']);
+                break;
+            case '2':
+                $search->orderByOnly404($request->get('order')[0]['dir']);
+                break;
+            case '3':
+                $search->orderByRedirectUrl($request->get('order')[0]['dir']);
+                break;
+            case '4':
+                $search->orderByPosition($request->get('order')[0]['dir']);
+                break;
+            default:
+                $search->orderByPosition();
+                break;
+        }
+
+        $search
+            ->offset($request->get('start'))
+            ->limit($request->get('length'))
+        ;
+        $searchArray = $search->find()->toArray();
+
+        $resultsArray = [];
+        foreach ($searchArray as $row) {
+            $id = $row['Id'];
+            $isRegexSelected = $row['RuleType'] === 'regex' ? 'selected' : '';
+            $isParamsSelected = $row['RuleType'] === 'params' ? 'selected' : '';
+            $isOnly404Checked = $row['Only404'] ? 'checked' : '';
+            $rewriteUrlRuleParams = RewriteurlRuleQuery::create()->findPk($row['Id'])->getRewriteUrlParamCollection();
+            $resultsArray[] = [
+                'Id' => $row['Id'],
+                'RuleType' => '<select class="js_rule_type form-control" data-idrule="' . $id . '" required>
+                                <option value="regex" ' . $isRegexSelected . '>' . Translator::getInstance()->trans("Regex", [], RewriteUrl::MODULE_DOMAIN) . '</option>
+                                <option value="params" ' . $isParamsSelected . '>' . Translator::getInstance()->trans("Get Params", [], RewriteUrl::MODULE_DOMAIN) . '</option>
+                               </select>',
+                'Value' => $this->renderRaw(
+                    "RewriteUrl/tab-value-render",
+                    [
+                        "REWRITE_URL_PARAMS" => $rewriteUrlRuleParams,
+                        "VALUE" => $row['Value'],
+                    ]
+                ),
+                'Only404' => '<input class="js_only404 form-control" type="checkbox" style="width: 100%!important;" ' . $isOnly404Checked . '/>',
+                'RedirectUrl' => '<div class="col-md-12 input-group">
+                                    <input class="js_url_to_redirect form-control" type="text" placeholder="/path/mypage.html" value="' . $row['RedirectUrl'] . '"/>
+                                  </div>',
+                'Position' => '<a href="#" class="u-position-up js_move_rule_position_up" data-idrule="' . $id . '"><i class="glyphicon glyphicon-arrow-up"></i></a>
+                                <span class="js_editable_rule_position editable editable-click" data-idrule="' . $id . '">' . $row['Position'] . '</span>
+                               <a href="#" class="u-position-down js_move_rule_position_down" data-idrule="' . $id . '"><i class="glyphicon glyphicon-arrow-down"></i></a>',
+                'Actions' => '<a href="#" class="js_btn_update_rule btn btn-success" data-idrule="' . $id . '"><span class="glyphicon glyphicon-check"></span></a>
+                              <a href="#" class="js_btn_remove_rule btn btn-danger" data-idrule="' . $id . '"><span class="glyphicon glyphicon-remove"></span></a>
+',
+            ];
+        }
+
+        return new JsonResponse([
+            'draw' => $request->get('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $resultsArray
+        ]);
     }
 
     public function setRewritingEnableAction()

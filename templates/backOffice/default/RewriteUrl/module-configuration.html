@@ -106,6 +106,20 @@
 
                             <table class="table table-condensed table-striped" id="redirection-table">
                                 <thead>
+                                    <tr>
+                                        <th class="text-center"><label class="control-label">{intl l="Rule type"}</label></th>
+                                        <th class="text-center"><label class="control-label">{intl l="Condition"} <a href="#" data-toggle="tooltip" title="{intl l="For the regex, your input is compare to URL without the domain name and without any GET params. Ex : for 'www.mysite.com/one/two?three=four', your regex will be compare to '/one/two'."}"><span class="glyphicon glyphicon-question-sign"></span></a></label></th>
+                                        <th class="text-center"><label class="control-label">{intl l="404 only"}</label></th>
+                                        <th class="text-center"><label class="control-label">{intl l="Redirect to"} <a href="#" data-toggle="tooltip" title="{intl l="Enter a URL with a leading '/' and no domain name. Ex : for 'www.mysite.com/one/two', enter '/one/two'."}"><span class="glyphicon glyphicon-question-sign"></span></a></label></th>
+                                        <th class="text-center"><label class="control-label">{intl l="Position"}</label></th>
+                                        <th class="text-center"><label class="control-label">{intl l="Actions"}</label></th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+                            <!--
+                            <table class="table table-condensed table-striped" id="redirection-table">
+                                <thead>
                                 <tr>
                                     <th class="text-center"><label class="control-label">{intl l="Rule type"}</label></th>
                                     <th class="text-center"><label class="control-label">{intl l="Condition"} <a href="#" data-toggle="tooltip" title="{intl l="For the regex, your input is compare to URL without the domain name and without any GET params. Ex : for 'www.mysite.com/one/two?three=four', your regex will be compare to '/one/two'."}"><span class="glyphicon glyphicon-question-sign"></span></a></label></th>
@@ -187,6 +201,7 @@
                                     {/loop}
                                 </tbody>
                             </table>
+                            -->
 
                         </div>
                     </div>

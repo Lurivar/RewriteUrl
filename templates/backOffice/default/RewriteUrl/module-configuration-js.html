@@ -58,21 +58,15 @@
 
 
             $(".js_rule_type").on("change", function (e) {
-                console.log('change');
                 var id_rule = this.dataset.idrule;
                 var selectedRuleType = $(this).val();
-                console.log(selectedRuleType);
 
-                console.log(id_rule);
                 var $container = $("tr[data-idrule=\""+id_rule+"\"]");
-                console.log($container);
 
                 if (selectedRuleType == "regex"){
-                    console.log('hihi');
                     $container.find(".js_regex_group").show();
                     $container.find(".js_param_rule_group").hide();
                 } else if (selectedRuleType == "params"){
-                    console.log('hoho');
                     $container.find(".js_regex_group").hide();
                     $container.find(".js_param_rule_group").show();
                 }
@@ -253,7 +247,6 @@
                     //}
                 });
 
-                console.log(data);
                 return data;
             }
 
@@ -288,7 +281,6 @@
                     data     : dataToSend,
                     type     : 'post',
                     success  : function(){
-                        console.log("success");
                         $loader.hide();
                     },
                     error : function(jqXHR, textStatus, errorThrown) {
@@ -413,7 +405,6 @@
 
         table.on( 'draw', function () {
             initSelectors();
-            console.log( 'Redraw occurred at: '+new Date().getTime() );
         } );
 
     });
